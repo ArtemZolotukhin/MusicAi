@@ -46,15 +46,9 @@ public class FFTSoundAnalyzerImpl implements FFTSoundAnalyzer {
 
 
             FFT fft = new FFT(blockSize, sampleRate);
-
-            //System.out.println(Arrays.toString(rawBlock));
             fft.forward(rawBlock);
 
             float[] spectrum = fft.getSpectrum();
-            //Normalize amplitude
-//            for(int j = 0; j < spectrum.length; j++) {
-//                spectrum[j] /= blockSize;
-//            }
 
 
             //Dirt, shit and blasphemy
@@ -70,11 +64,6 @@ public class FFTSoundAnalyzerImpl implements FFTSoundAnalyzer {
 
         }
 
-        //TODO remove sout
-        System.out.println("Amplitude freq block sum: " + Arrays.toString(averageAmplitude));
-        System.out.println("Amplitude freq block iteration: " + Arrays.toString(averageAmplitudeIterations));
-
-
 
         //Calculate average freqs
         for (int i = 0; i < averageAmplitude.length; i++) {
@@ -89,7 +78,6 @@ public class FFTSoundAnalyzerImpl implements FFTSoundAnalyzer {
         for (int i = 0; i < averageAmplitude.length; i++) {
             averageAmplitudeSum += averageAmplitude[i];
         }
-        System.out.println("Average Amplitude SUM: " + averageAmplitudeSum);
 
 
         FFTResult fftResult = new FFTResult();

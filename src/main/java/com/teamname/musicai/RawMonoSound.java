@@ -1,13 +1,14 @@
 package com.teamname.musicai;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class RawMonoSound {
-    private ArrayList<Float> raw;
+    private List<Float> raw;
     private int sampleRate;
     private int sampleSizeInBytes;
 
-    RawMonoSound(ArrayList<Float> raw, float sampleRate, int sampleSizeInBytes) {
+    public RawMonoSound(List<Float> raw, float sampleRate, int sampleSizeInBytes) {
         this.raw = raw;
         this.sampleRate = (int) sampleRate;
         this.sampleSizeInBytes = sampleSizeInBytes;
@@ -16,7 +17,7 @@ public class RawMonoSound {
     public RawMonoSound() {
     }
 
-    public ArrayList<Float> getRaw() {
+    public List<Float> getRaw() {
         return raw;
     }
 
