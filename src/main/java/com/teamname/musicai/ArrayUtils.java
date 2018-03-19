@@ -15,4 +15,17 @@ public class ArrayUtils {
 
     }
 
+    public static int[] toPrimitiveInteger(Integer[] array) {
+        //todo validate on null
+        int[] result = new int[array.length];
+
+        for (int i = 0; i < array.length; i++) {
+            result[i] = array[i] == null ? 0 : array[i];
+        }
+
+        return result;
+
+
+    }
+
 }

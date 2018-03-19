@@ -56,7 +56,7 @@ public class WaveFileConverterImpl implements WaveFileConverter {
 
             //System.out.println(Arrays.toString(tmp));
 
-            float f = formatBytesToAmplitude(tmp, byteRate);
+            float f = ByteBuffer.wrap(tmp).order(ByteOrder.LITTLE_ENDIAN).getInt();
             //System.out.println(f);
             samples.add(f);
             //break;
@@ -76,9 +76,4 @@ public class WaveFileConverterImpl implements WaveFileConverter {
         return new RawMonoSound(samples, sampleRate, byteRate);
     }
 
-    private float formatBytesToAmplitude(byte[] bytes, int byteRate) {
-        //time to bad code again
-        float maxAbsSignedValue = (float) Math.pow(2, byteRate * 8) / 2;
-        return (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() - maxAbsSignedValue) / maxAbsSignedValue;
-    }
 }
