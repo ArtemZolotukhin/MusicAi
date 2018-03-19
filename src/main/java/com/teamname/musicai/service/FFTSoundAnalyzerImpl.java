@@ -68,7 +68,7 @@ public class FFTSoundAnalyzerImpl implements FFTSoundAnalyzer {
         //Calculate average freqs
         for (int i = 0; i < averageAmplitude.length; i++) {
             //violence torture for eyes
-            averageAmplitude[i] /= blockSize * (float) Math.pow(2, rawMonoSound.getSampleSizeInBytes() * 8) *
+            averageAmplitude[i] /= blockSize *
                     (averageAmplitudeIterations[i] == 0l ? 1 : averageAmplitudeIterations[i]);
         }
 

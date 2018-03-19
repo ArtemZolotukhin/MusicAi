@@ -54,26 +54,17 @@ public class WaveFileConverterImpl implements WaveFileConverter {
                 tmp[j] = audioData[i + j];
             }
 
-            //System.out.println(Arrays.toString(tmp));
-
-            float f = ByteBuffer.wrap(tmp).order(ByteOrder.LITTLE_ENDIAN).getInt();
-            //System.out.println(f);
+            float f = formatBytesToAmplitude(tmp, byteRate);
             samples.add(f);
-            //break;
-        }
-
-//
-        int k = 0;
-        for (Float i : samples) {
-            System.out.println(i);
-            if (k < 64) {
-                k++;
-            } else  {
-                break;
-            }
         }
 
         return new RawMonoSound(samples, sampleRate, byteRate);
+    }
+
+    private float formatBytesToAmplitude(byte[] bytes, int byteRate) {
+        //time to bad code again
+        float maxAbsSignedValue = (float) Math.pow(2, byteRate * 8) / 2;
+        return (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() - maxAbsSignedValue) / maxAbsSignedValue;
     }
 
 }
