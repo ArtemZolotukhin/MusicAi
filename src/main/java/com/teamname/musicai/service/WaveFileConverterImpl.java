@@ -1,5 +1,6 @@
 package com.teamname.musicai.service;
 
+import com.sun.org.apache.bcel.internal.generic.FLOAD;
 import com.teamname.musicai.RawMonoSound;
 import com.teamname.musicai.WaveFile;
 
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class WaveFileConverterImpl implements WaveFileConverter {
 
-    public static final int FLOAT_SIZE = 4;
+    public static final int INT_SIZE = 4;
 
     @Override
     public RawMonoSound toRawMonoSound(WaveFile waveFile, int startSec, int endSec) {
@@ -25,7 +26,7 @@ public class WaveFileConverterImpl implements WaveFileConverter {
 
         int sampleRate = Math.round(waveFile.getAudioFormat().getSampleRate());
 
-        if (byteRate > FLOAT_SIZE) {
+        if (byteRate > INT_SIZE) {
             throw new IllegalArgumentException("framSize too big");
         }
 
@@ -44,18 +45,40 @@ public class WaveFileConverterImpl implements WaveFileConverter {
 
         List<Float> samples = new ArrayList<Float>(sampleCount + 1);
 
-        float koff = (float) Math.pow(2, byteRate * 8);
-        byte[] tmp = new byte[FLOAT_SIZE];
+
+        byte[] tmp = new byte[INT_SIZE];
 
         for (int i = startSec * byteRate * channels * sampleRate; i < endSec * channels * byteRate * sampleRate; i += byteRate * channels){
             Arrays.fill(tmp, (byte) 0);
             for (int j = 0; j < byteRate; j++) {
                 tmp[j] = audioData[i + j];
             }
-            float f = ByteBuffer.wrap(tmp).order(ByteOrder.LITTLE_ENDIAN).getInt() / koff;
+
+            //System.out.println(Arrays.toString(tmp));
+
+            float f = formatBytesToAmplitude(tmp, byteRate);
+            //System.out.println(f);
             samples.add(f);
+            //break;
+        }
+
+//
+        int k = 0;
+        for (Float i : samples) {
+            System.out.println(i);
+            if (k < 64) {
+                k++;
+            } else  {
+                break;
+            }
         }
 
         return new RawMonoSound(samples, sampleRate, byteRate);
+    }
+
+    private float formatBytesToAmplitude(byte[] bytes, int byteRate) {
+        //time to bad code again
+        float maxAbsSignedValue = (float) Math.pow(2, byteRate * 8) / 2;
+        return (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() - maxAbsSignedValue) / maxAbsSignedValue;
     }
 }
