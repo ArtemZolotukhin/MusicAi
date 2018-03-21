@@ -63,8 +63,8 @@ public class WaveFileConverterImpl implements WaveFileConverter {
 
     private float formatBytesToAmplitude(byte[] bytes, int byteRate) {
         //time to bad code again
-        float maxAbsSignedValue = (float) Math.pow(2, byteRate * 8) / 2;
-        return (ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() - maxAbsSignedValue) / maxAbsSignedValue;
+        float maxAbsSignedValue = (float) Math.pow(2, byteRate * 8);
+        return ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt() / maxAbsSignedValue;
     }
 
 }
