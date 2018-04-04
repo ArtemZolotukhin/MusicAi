@@ -24,7 +24,7 @@ public class Processing {
 
         WaveFile audio = new WaveFile(new File(path));
 
-        RawMonoSound rawMonoSound = waveFileConverter.toRawMonoSound(audio, 0, 25);
+        RawMonoSound rawMonoSound = waveFileConverter.toRawMonoSound(audio, 0,25);
 
         FFTSoundAnalyzer fftSoundAnalyzer = new FFTSoundAnalyzerImpl();
 

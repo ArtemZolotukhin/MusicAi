@@ -20,7 +20,7 @@ public class FFTSoundAnalyzerImpl implements FFTSoundAnalyzer {
      * @param blockTimeSec - it is fake //todo
      * @return
      */
-    @Override
+
     public FFTResult analyze(RawMonoSound rawMonoSound, int blockTimeSec) {
         //TODO remove this and make normal round to power of 2
         int blockSize = 2048; //closest ceil power of 2 to 2205 (50milisec for sampleRate = 44100)

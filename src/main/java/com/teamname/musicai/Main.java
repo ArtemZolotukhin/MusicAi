@@ -20,10 +20,10 @@ import java.util.Scanner;
  */
 public class Main {
 
-    public static final int GENRE = 6;
+    public static final int GENRE = 10;
     public static final int PARAM = 8;
-    public static final String FILE_PATH_TRAINING = "training.txt";
-    public static final String FILE_PATH_TEST = "test.txt";
+    public static final String FILE_PATH_TRAINING = "training2.txt";
+    public static final String FILE_PATH_TEST = "test2.txt";
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
         Scanner sc = new Scanner(System.in);
         System.out.println("выберите режим: newData, learn, test, getGenre, findParam");
@@ -51,6 +51,7 @@ public class Main {
                         bestSecondParam=j;
                         maxSum = localSum;
                     }
+                    System.out.println(i+" "+j+" = "+localSum/GENRE+"%");
                 }
             }
             System.out.println(bestFirstParam+" and "+bestSecondParam+" have "+maxSum/GENRE+"%");
@@ -71,13 +72,13 @@ public class Main {
         }
 
         if (mode.equals("learn")){
-            learn(new int[]{PARAM,8,8,GENRE},"alex.txt");
+            learn(new int[]{PARAM,10,GENRE},"alex2.txt");
 
         }
 
 
         if (mode.equals("test")){
-            double [] result = test("alex8_15.txt");
+            double [] result = test("alex2.txt");
             for (int i=0; i<GENRE; i++){
                 System.out.println(result[i] + "%");
             }
@@ -158,6 +159,15 @@ public class Main {
                 return "Pop music";
             case 5:
                 return "Rock music";
+            case 6:
+                return "Blues music";
+            case 7 :
+                return "Country music";
+            case 8:
+                return "Disco music";
+            case 9:
+                return "Reggae music";
+
 
         }
         return null;
