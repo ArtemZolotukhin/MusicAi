@@ -22,13 +22,14 @@ public class Main {
 
     public static final int GENRE = 10;
     public static final int PARAM = 8;
-    public static final String FILE_PATH_TRAINING = "training2.txt";
-    public static final String FILE_PATH_TEST = "test2.txt";
+
     public static void main(String[] args) throws IOException, UnsupportedAudioFileException {
         Scanner sc = new Scanner(System.in);
-        System.out.println("выберите режим: newData, learn, test, getGenre, findParam");
+        System.out.println("выберите режим: newData, learn, test, getGenre, findParam, crossValid");
         String mode = sc.next();
 
+        String file_path_training = "training2.txt";
+        String file_path_test = "test2.txt";
 
         if (mode.equals("findParam")){
             int bestFirstParam=0;
@@ -39,10 +40,10 @@ public class Main {
                     int[] x = {PARAM,i,j,GENRE};
                     String name = "alex";
                     name = name + i + "_" + j + ".txt";
-                    learn(x,name);
+                    learn(x,name,file_path_training);
 
                     double localSum=0;
-                    double[] result = test(name);
+                    double[] result = test(name,file_path_test);
                     for (int k=0; k<GENRE; k++){
                         localSum +=result[k];
                     }
@@ -57,7 +58,7 @@ public class Main {
             System.out.println(bestFirstParam+" and "+bestSecondParam+" have "+maxSum/GENRE+"%");
 
         }
-        else work(mode);
+        else work(mode,file_path_training,file_path_test);
 
 
 
@@ -65,20 +66,45 @@ public class Main {
 
     }
 
-    public static void work(String mode) throws IOException, UnsupportedAudioFileException {
+    public static void work(String mode,String file_path_training,String file_path_test) throws IOException, UnsupportedAudioFileException {
+        if (mode.equals("crossValid")){
+            int n=10;
+            double[] sum= new double[GENRE];
+            for (int k=0; k<GENRE; k++) {
+                sum[k] =0;
+            }
+            for (int i=0; i<n; i++){
+                int[] x = {PARAM,15,15,GENRE};
+                String name = "alex" + i +  ".txt";
+                file_path_training = "cvTraining" + i +  ".txt";
+                file_path_test = "cvTest" + i +  ".txt";
+                //createInputData(file_path_training,file_path_test,i*10,i*10+10);
+                //learn(x,name,file_path_training);
+
+                double[] result = test(name,file_path_test);
+                for (int k=0; k<GENRE; k++) {
+                    sum[k] += result[k];
+                }
+            }
+            for (int k=0; k<GENRE; k++) {
+                sum[k] =sum[k]/n;
+                System.out.println(sum[k]+"%");
+            }
+
+        }
         if (mode.equals("newData")){
-            createInputData();
+            createInputData(file_path_training,file_path_test);
 
         }
 
         if (mode.equals("learn")){
-            learn(new int[]{PARAM,10,GENRE},"alex2.txt");
+            learn(new int[]{PARAM,15,15,GENRE},"alex2.txt",file_path_training);
 
         }
 
 
         if (mode.equals("test")){
-            double [] result = test("alex2.txt");
+            double [] result = test("alex2.txt",file_path_test);
             for (int i=0; i<GENRE; i++){
                 System.out.println(result[i] + "%");
             }
@@ -114,9 +140,9 @@ public class Main {
 
     }
 
-    public static DataSet getDataSet(int x, int y)  throws FileNotFoundException {
+    public static DataSet getDataSet(int x, int y, String file_path_training)  throws FileNotFoundException {
         DataSet trainingSet = new DataSet(x,y);
-        Scanner sc = new Scanner(new File(FILE_PATH_TRAINING));
+        Scanner sc = new Scanner(new File(file_path_training));
 
 
         while (sc.hasNext()){
@@ -175,10 +201,10 @@ public class Main {
 
 
 
-    public static double[] test(String path) throws FileNotFoundException {
+    public static double[] test(String path, String file_path_test) throws FileNotFoundException {
 
         NeuralNetwork alex = NeuralNetwork.createFromFile(path);
-        Scanner sc = new Scanner(new File(FILE_PATH_TEST));
+        Scanner sc = new Scanner(new File(file_path_test));
         double [] find = new double[GENRE];
         double [] all = new double[GENRE];
         while ( sc.hasNext()){
@@ -205,33 +231,60 @@ public class Main {
 
     }
 
-    public static void createInputData() throws IOException, UnsupportedAudioFileException {
-        String path ="C:\\Users\\volkov\\Desktop\\genres";
-        Processing p = new Processing();
-        createData(path,FILE_PATH_TRAINING,p,0,90);
-        createData(path,FILE_PATH_TEST,p,90,100);
+    public static void createInputData(String file_path_training,String file_path_test) throws IOException, UnsupportedAudioFileException {
+        createInputData(file_path_training,file_path_test,90,100);
     }
+    public static void createInputData(String file_path_training,String file_path_test,int start,int end) throws IOException, UnsupportedAudioFileException {
+        String path ="C:\\Users\\volkov\\Desktop\\genres";
+        //amount of music
+        int n=100;
 
-    public static void createData(String sourcePath,String savePath, Processing p,int start,int end) throws IOException, UnsupportedAudioFileException {
-        PrintWriter pw = new PrintWriter(savePath);
-
-        for (int j=start; j<end; j++){
-            for (int i=0; i<GENRE; i++){
-                Float[] a = p.getParameters(sourcePath+"\\1"+i+"\\"+j+".wav");
-                for(int k=0; k<a.length; k++){
-                    a[k] = a[k]*100;
-                    pw.print(a[k].toString().replace('.',',')+" ");
-                }
-                pw.println(i);
-            }
+        Processing p = new Processing();
+        String [] result = createData(path,p,n);
+        PrintWriter pw = new PrintWriter(file_path_training);
+        for (int i=0; i<start*GENRE; i++){
+            pw.println(result[i]);
+        }
+        for (int i=end*GENRE; i<n*GENRE; i++){
+            pw.println(result[i]);
         }
         pw.close();
 
+        pw = new PrintWriter(file_path_test);
+        for (int i=start*GENRE; i<end*GENRE; i++){
+            pw.println(result[i]);
+        }
+        pw.println();
+        pw.close();
     }
 
-    public static void learn(int[] x,String name) throws FileNotFoundException {
+    public static String[]  createData(String sourcePath, Processing p,int n) throws IOException, UnsupportedAudioFileException {
+
+        String [] result = new String[n*GENRE];
+        for (int j=0; j<100; j++){
+            for (int i=0; i<GENRE; i++){
+                int number = j*GENRE+i;
+                result[number] ="";
+            }
+        }
+        for (int j=0; j<100; j++){
+            for (int i=0; i<GENRE; i++){
+                int number = j*GENRE+i;
+                Float[] a = p.getParameters(sourcePath+"\\1"+i+"\\"+j+".wav");
+                for(int k=0; k<a.length; k++){
+                    a[k] = a[k]*100;
+                    result[number] += a[k].toString().replace('.',',')+" ";
+                }
+                result[number] += i;
+            }
+        }
+        return result;
+
+    }
+
+    public static void learn(int[] x,String name,String file_path_training) throws FileNotFoundException {
         NeuralNetwork alex = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,x);
-        DataSet trainingSet = getDataSet(PARAM,GENRE);
+        DataSet trainingSet = getDataSet(PARAM,GENRE,file_path_training);
         BackPropagation backPropagation = new BackPropagation();
         backPropagation.setLearningRate(0.01);
         backPropagation.setMaxIterations(10000);
